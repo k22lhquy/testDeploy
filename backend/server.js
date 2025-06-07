@@ -6,7 +6,7 @@ import userRouters from "./routes/user.routes.js";
 import postRouters from "./routes/post.routes.js";
 import notificationRouters from "./routes/notification.routes.js";
 import messageRouters from "./routes/message.router.js";
-import connectMongoDB from "./db/connectMongodb.js";
+import connectMongoDB from "./db/connectMongoDB.js";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
 import cors from "cors";
