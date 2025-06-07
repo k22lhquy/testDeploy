@@ -21,7 +21,7 @@ import NotificationsAdmin from "./pages/admin/notifications/NotificationsAdmin";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import PostHiddenAdmin from "./pages/admin/posts/PostHiddenAdmin";
 import PostReportAdmin from "./pages/admin/posts/PostReportAdmin";
-import ForgotPassword from "./pages/auth/forgotPassword/forgotPassword";
+import ForgotPassword from "./pages/auth/forgotPassword/ForgotPassword";
 
 function App() {
   // const isLogin = !!localStorage.getItem("token");
