@@ -49,10 +49,10 @@ router.get(
         { expiresIn: "72h" }
       );
 
-      res.redirect(`https://your-frontend-url.onrender.com/oauth-success?token=${token}`);
+      res.redirect(`https://xx-m8te.onrender.com/oauth-success?token=${token}`);
     } catch (error) {
       console.error("OAuth callback error:", error);
-      res.redirect("https://your-frontend-url.onrender.com/login?error=oauth_failed");
+      res.redirect("https://xx-m8te.onrender.com/login?error=oauth_failed");
     }
   }
 );
