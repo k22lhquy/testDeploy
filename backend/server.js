@@ -44,7 +44,11 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cors({}));
+app.use(cors({
+  origin: "https://xx-m8te.onrender.com",
+  credentials: true
+}));
+
 
 app.use("/api/auth", authRouters);
 app.use("/api/admin", adminRouters);
