@@ -135,9 +135,9 @@ const commentOnPost = async (req, res) => {
     await post.save();
 
     res.status(200).json({
-      message: isFlagged
-        ? "Comment added, but flagged for moderation"
-        : "Comment added successfully",
+      // message: isFlagged
+      //   ? "Comment added, but flagged for moderation"
+      //   : "Comment added successfully",
       post,
     });
   } catch (error) {
