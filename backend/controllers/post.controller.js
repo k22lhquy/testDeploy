@@ -5,28 +5,30 @@ import Notification from "../models/notification.model.js";
 // import {
 //   moderatePostContent,
 //   moderateCommentContent,
-// } from "../moderation/moderation.service.js";
+//   checkImageForInappropriateContent,
+//   notifyAdmins
+// } from '../moderation/moderation.service.js';
+
 
 const getPostById = async (req, res) => {
   try {
     const { postId } = req.params;
     const post = await Post.findById(postId).populate(
-      "author",
-      "username profileImg"
+      "user",
+      "username profileImg fullname"
     );
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    res.status(200).json({
-      post,
-    });
+    res.status(200).json(post); // trả trực tiếp object thay vì { post }
   } catch (error) {
     console.error("❌ Error fetching post:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const createPost = async (req, res) => {
   try {

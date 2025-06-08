@@ -1,28 +1,36 @@
+// // moderation.service.js
+
 // import axios from 'axios';
 // import * as nsfwjs from 'nsfwjs';
 // import { createCanvas, loadImage } from 'canvas';
+// import { Buffer as NodeBuffer } from 'node:buffer'; // ✅ đổi tên tránh trùng
 
-// import { FlaggedContent } from './FlaggedContent.js';
-// import { Notification } from '../models/notification.model.js';
-// import { User } from '../models/user.model.js';
+// import FlaggedContent from './FlaggedContent.js';
+// import Notification from '../models/notification.model.js';
+// import User from '../models/user.model.js';
 // import { getReceiverSocketId, io } from '../lib/socket.js';
 // import sensitiveWords from './sensitiveWords.js';
+
+// // Nếu cần gán Buffer vào globalThis (hiếm khi cần):
+// if (typeof globalThis.Buffer === 'undefined') {
+//   globalThis.Buffer = NodeBuffer;
+// }
 
 // let nsfwModel;
 // (async () => {
 //   nsfwModel = await nsfwjs.load();
-//   console.log("Mô hình NSFWJS đã được tải!");
+//   console.log("✅ Mô hình NSFWJS đã được tải!");
 // })();
 
-// const checkImageForInappropriateContent = async (imageUrl) => {
+// export const checkImageForInappropriateContent = async (imageUrl) => {
 //   try {
 //     if (!nsfwModel) {
-//       console.warn("NSFW model chưa sẵn sàng!");
+//       console.warn("⚠️ NSFW model chưa sẵn sàng!");
 //       return false;
 //     }
 
 //     const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-//     const imageBuffer = Buffer.from(response.data, 'binary');
+//     const imageBuffer = NodeBuffer.from(response.data, 'binary');
 
 //     const img = await loadImage(imageBuffer);
 //     const canvas = createCanvas(img.width, img.height);
@@ -30,23 +38,21 @@
 //     ctx.drawImage(img, 0, 0, img.width, img.height);
 
 //     const predictions = await nsfwModel.classify(canvas);
-//     console.log('Predictions:', predictions);
+//     console.log('🔍 Predictions:', predictions);
 
 //     const porn = predictions.find(p => p.className === 'Porn')?.probability || 0;
 //     const sexy = predictions.find(p => p.className === 'Sexy')?.probability || 0;
 //     const hentai = predictions.find(p => p.className === 'Hentai')?.probability || 0;
 //     const drawing = predictions.find(p => p.className === 'Drawing')?.probability || 0;
 
-//     const isFlagged = (porn > 0.4 || sexy > 0.4 || hentai > 0.4 || drawing > 0.7);
-
-//     return isFlagged;
+//     return (porn > 0.4 || sexy > 0.4 || hentai > 0.4 || drawing > 0.7);
 //   } catch (error) {
-//     console.error("Lỗi khi kiểm duyệt ảnh bằng NSFWJS:", error.message);
+//     console.error("❌ Lỗi kiểm duyệt ảnh:", error.message);
 //     return false;
 //   }
 // };
 
-// const notifyAdmins = async (message, fromUserId) => {
+// export const notifyAdmins = async (message, fromUserId) => {
 //   try {
 //     const admins = await User.find({ role: 'admin' });
 
@@ -68,11 +74,11 @@
 //       }
 //     });
 //   } catch (err) {
-//     console.error("Lỗi khi gửi thông báo đến admin:", err);
+//     console.error("❌ Gửi thông báo lỗi:", err);
 //   }
 // };
 
-// const moderatePostContent = async (post) => {
+// export const moderatePostContent = async (post) => {
 //   const reasons = [];
 
 //   const allBadWords = [
@@ -93,15 +99,13 @@
 
 //   if (post.image) {
 //     const response = await axios.get(post.image, { responseType: 'arraybuffer' });
-//     const imageBuffer = Buffer.from(response.data, 'binary');
+//     const imageBuffer = NodeBuffer.from(response.data, 'binary');
 //     const img = await loadImage(imageBuffer);
 //     const canvas = createCanvas(img.width, img.height);
 //     const ctx = canvas.getContext('2d');
 //     ctx.drawImage(img, 0, 0, img.width, img.height);
 
 //     const predictions = await nsfwModel.classify(canvas);
-//     console.log('Predictions:', predictions);
-
 //     const reasonsMap = {
 //       'Porn': 0.4,
 //       'Sexy': 0.4,
@@ -130,7 +134,7 @@
 //   }
 // };
 
-// const moderateCommentContent = async (comment, postId) => {
+// export const moderateCommentContent = async (comment, postId) => {
 //   const reasons = [];
 
 //   const allBadWords = [
@@ -162,11 +166,4 @@
 //   }
 
 //   return false;
-// };
-
-// export {
-//   moderatePostContent,
-//   checkImageForInappropriateContent,
-//   notifyAdmins,
-//   moderateCommentContent
 // };
