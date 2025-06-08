@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { formatPostDate } from "../../utils/date";
 import { useChatStore } from "../../store/useChatStore";
 
-const Post = ({ post, onDelete }) => {
+const Post = ({ post, onRefresh }) => {
   const { authUser: user, reportPost, reportComments, editCommentStore } = useChatStore();
   const [comment, setComment] = useState("");
   const [reportText, setReportText] = useState("");
@@ -30,7 +30,7 @@ const Post = ({ post, onDelete }) => {
   const handleDeletePost = async () => {
     const response = await axiosInstance.delete(`/api/posts/${post._id}`);
     if (response.status === 200) {
-      onDelete();
+      onRefresh();
     } else {
       console.error("Error deleting post");
     }
@@ -43,7 +43,7 @@ const Post = ({ post, onDelete }) => {
       if (response.status === 200) {
         setComment("");
         toast.success("Comment posted successfully");
-        onDelete(); // optional: or manually append new comment
+        onRefresh(); // optional: or manually append new comment
       }
     } catch (error) {
       console.error("Error posting comment:", error);
@@ -54,7 +54,7 @@ const Post = ({ post, onDelete }) => {
     try {
       const response = await axiosInstance.post(`/api/posts/like/${post._id}`);
       if (response.status === 200) {
-        onDelete();
+        onRefresh();
       }
     } catch (error) {
       console.error("Error liking post:", error);
