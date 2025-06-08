@@ -136,7 +136,7 @@ const NotificationPage = () => {
         >
           <div className="w-full max-w-5xl modal-box">
             {selectedPost && (
-              <Post post={selectedPost} onDelete={handleRefresh} />
+              <Post post={selectedPost} onRefresh={handleRefresh} />
             )}
           </div>
         </dialog>
