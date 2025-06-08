@@ -9,6 +9,10 @@ const getNotifications = async (req, res) => {
         path: "from",
         select: "username profileImg",
       })
+      .populate({
+        path: "postId", // tên trường lưu bài viết
+        select: "title image", // chọn trường cần thiết
+      })
       .sort({ createdAt: -1 });
 
     await Notification.updateMany({ to: userId }, { read: true });
@@ -18,6 +22,7 @@ const getNotifications = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const getNotificationsWeb = async (req, res) => {
   try {

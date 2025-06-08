@@ -11,7 +11,7 @@ import {
   getUserPost,
   reportPost,
   editComment,
-//   editPost,
+  editPost,
   reportComment,
   getPostById,
 } from "../controllers/post.controller.js";
@@ -32,6 +32,6 @@ router.post("/report/post/:postId", protectRoute, reportPost);
 router.post("/report/comment/:commentId", protectRoute, reportComment);
 
 router.put("/editComment/:commentId", protectRoute, editComment);
-// router.put("/editPost/:postId", protectRoute, editPost);
+router.put("/editPost/:postId", protectRoute, editPost);
 
 export default router;
