@@ -5,11 +5,11 @@
 // import { createCanvas, loadImage } from 'canvas';
 // import { Buffer as NodeBuffer } from 'node:buffer'; // ✅ đổi tên tránh trùng
 
-// import FlaggedContent from './FlaggedContent.js';
-// import Notification from '../models/notification.model.js';
+import FlaggedContent from './FlaggedContent.js';
+import Notification from '../models/notification.model.js';
 // import User from '../models/user.model.js';
 // import { getReceiverSocketId, io } from '../lib/socket.js';
-// import sensitiveWords from './sensitiveWords.js';
+import sensitiveWords from './sensitiveWords.js';
 
 // // Nếu cần gán Buffer vào globalThis (hiếm khi cần):
 // if (typeof globalThis.Buffer === 'undefined') {
@@ -52,31 +52,19 @@
 //   }
 // };
 
-// export const notifyAdmins = async (message, fromUserId) => {
-//   try {
-//     const admins = await User.find({ role: 'admin' });
-
-//     const notifications = admins.map(admin => ({
-//       from: fromUserId,
-//       to: admin._id,
-//       type: 'moderation',
-//       reason: message,
-//     }));
-
-//     await Notification.insertMany(notifications);
-
-//     admins.forEach(admin => {
-//       if (admin.socketId) {
-//         io.to(admin.socketId).emit('newNotification', {
-//           message,
-//           fromUserId,
-//         });
-//       }
-//     });
-//   } catch (err) {
-//     console.error("❌ Gửi thông báo lỗi:", err);
-//   }
-// };
+export const notifyAdmins = async (message, fromUserId) => {
+  try {
+    await Notification.create({
+      from: userId,
+      to: null,
+      post: postId,
+      type: "moderation",
+      reason: message,
+    });
+  } catch (err) {
+    console.error("❌ Gửi thông báo lỗi:", err);
+  }
+};
 
 // export const moderatePostContent = async (post) => {
 //   const reasons = [];
@@ -134,36 +122,36 @@
 //   }
 // };
 
-// export const moderateCommentContent = async (comment, postId) => {
-//   const reasons = [];
+export const moderateCommentContent = async (comment, postId) => {
+  const reasons = [];
 
-//   const allBadWords = [
-//     ...sensitiveWords.vulgar,
-//     ...sensitiveWords.privacy,
-//     ...sensitiveWords.racist,
-//     ...sensitiveWords.sexist,
-//     ...sensitiveWords.suicide,
-//   ];
+  const allBadWords = [
+    ...sensitiveWords.vulgar,
+    ...sensitiveWords.privacy,
+    ...sensitiveWords.racist,
+    ...sensitiveWords.sexist,
+    ...sensitiveWords.suicide,
+  ];
 
-//   const text = comment.text.toLowerCase();
-//   const detectedWords = allBadWords.filter(word => text.includes(word.toLowerCase()));
-//   if (detectedWords.length > 0) {
-//     reasons.push(`Comment contains inappropriate text: ${detectedWords.join(', ')}`);
-//   }
+  const text = comment.text.toLowerCase();
+  const detectedWords = allBadWords.filter(word => text.includes(word.toLowerCase()));
+  if (detectedWords.length > 0) {
+    reasons.push(`Comment contains inappropriate text: ${detectedWords.join(', ')}`);
+  }
 
-//   if (reasons.length > 0) {
-//     await FlaggedContent.create({
-//       comment: comment,
-//       post: postId,
-//       reason: reasons.join(', '),
-//     });
+  if (reasons.length > 0) {
+    await FlaggedContent.create({
+      comment: comment,
+      post: postId,
+      reason: reasons.join(', '),
+    });
 
-//     await notifyAdmins(
-//       `Comment flagged on post ${postId}. Reason(s): ${reasons.join(', ')}`,
-//       comment.user
-//     );
-//     return true;
-//   }
+    await notifyAdmins(
+      `Comment flagged on post ${postId}. Reason(s): ${reasons.join(', ')}`,
+      comment.user
+    );
+    return true;
+  }
 
-//   return false;
-// };
+  return false;
+};
