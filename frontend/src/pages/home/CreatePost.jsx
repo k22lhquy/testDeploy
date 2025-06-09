@@ -28,6 +28,8 @@ const CreatePost = () => {
 		  });
 		  console.log("Tạo bài viết thành công:", response.data);
 		  changeRefreshPosts();
+		  setText("");
+		  setImg(null);
 		  return response.data;
 		} catch (error) {
 		  console.error("Lỗi khi tạo bài viết:", error);

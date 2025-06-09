@@ -2,6 +2,7 @@ import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import Notification from "../models/notification.model.js";
+import { moderatePostContent } from "../moderation/moderation.service.js";
 // import {
 //   moderatePostContent,
 //   moderateCommentContent,
@@ -64,7 +65,7 @@ const createPost = async (req, res) => {
 
     await newPost.save();
 
-    // await moderatePostContent(newPost);
+    await moderatePostContent(newPost);
 
     res.status(201).json({
       message: "Post created successfully",

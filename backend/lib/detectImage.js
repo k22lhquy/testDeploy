@@ -1,5 +1,5 @@
 // detectImage.js
-export async function detectImage(imageData, apiUrl = 'http://localhost:10000/predict') {
+export async function detectImage(imageData, apiUrl = 'http://127.0.0.1:10000/predict') {
   try {
     const response = await fetch(apiUrl, {
       method: 'POST',

@@ -28,12 +28,12 @@ const notificationReport = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const notifications = await Notification.find({ type: "report" })
+    const notifications = await Notification.find({ type: { $in: ["report", "moderation"] } })
       .populate("from")
       .populate({
         path: "post",
         populate: { path: "user", model: "User" },
-      });
+    });
 
     res.status(200).json({ message: "Notifications retrieved successfully", notifications });
   } catch (error) {

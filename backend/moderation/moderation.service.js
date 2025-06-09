@@ -1,15 +1,9 @@
-// // moderation.service.js
-
-// import axios from 'axios';
-// import * as nsfwjs from 'nsfwjs';
-// import { createCanvas, loadImage } from 'canvas';
-// import { Buffer as NodeBuffer } from 'node:buffer'; // ✅ đổi tên tránh trùng
-
 import FlaggedContent from './FlaggedContent.js';
 import Notification from '../models/notification.model.js';
-// import User from '../models/user.model.js';
-// import { getReceiverSocketId, io } from '../lib/socket.js';
 import sensitiveWords from './sensitiveWords.js';
+
+import { detectImage } from '../lib/detectImage.js';
+
 
 // // Nếu cần gán Buffer vào globalThis (hiếm khi cần):
 // if (typeof globalThis.Buffer === 'undefined') {
@@ -52,12 +46,12 @@ import sensitiveWords from './sensitiveWords.js';
 //   }
 // };
 
-export const notifyAdmins = async (message, fromUserId) => {
+export const notifyAdmins = async (message, fromUserId, post) => {
   try {
     await Notification.create({
-      from: userId,
+      from: fromUserId,
       to: null,
-      post: postId,
+      post: post,
       type: "moderation",
       reason: message,
     });
@@ -65,6 +59,9 @@ export const notifyAdmins = async (message, fromUserId) => {
     console.error("❌ Gửi thông báo lỗi:", err);
   }
 };
+// const imageUrl = 'https://example.com/your-image.jpg';
+
+
 
 // export const moderatePostContent = async (post) => {
 //   const reasons = [];
@@ -121,8 +118,10 @@ export const notifyAdmins = async (message, fromUserId) => {
 //     );
 //   }
 // };
+// import axios from 'axios';
+// import { detectImage } from './detectImage.js'; // nhớ import hàm detectImage bạn viết
 
-export const moderateCommentContent = async (comment, postId) => {
+export const moderatePostContent = async (post) => {
   const reasons = [];
 
   const allBadWords = [
@@ -133,25 +132,69 @@ export const moderateCommentContent = async (comment, postId) => {
     ...sensitiveWords.suicide,
   ];
 
-  const text = comment.text.toLowerCase();
-  const detectedWords = allBadWords.filter(word => text.includes(word.toLowerCase()));
-  if (detectedWords.length > 0) {
-    reasons.push(`Comment contains inappropriate text: ${detectedWords.join(', ')}`);
+  // Kiểm tra text
+  if (post.text) {
+    const text = post.text.toLowerCase();
+    const detectedWords = allBadWords.filter(word => text.includes(word.toLowerCase()));
+    if (detectedWords.length > 0) {
+      reasons.push(`Inappropriate text: ${detectedWords.join(', ')}`);
+    }
   }
 
+  // Kiểm tra ảnh qua API detectImage
+  if (post.image) {
+    try {
+      // Gọi API detectImage trả về kết quả
+      const result = await detectImage(post.image);
+
+      if (result.is_approved === false) {
+        // Nếu không approved, ghi lý do ra
+        reasons.push(`Image flagged for ${result.reason} (confidence: ${(result.confidence * 100).toFixed(1)}%)`);
+        console.log(`Image flagged for ${result.reason} (confidence: ${(result.confidence * 100).toFixed(1)}%)`)
+      }
+    } catch (err) {
+      console.error('Error detecting image:', err);
+      reasons.push('Image detection failed');
+    }
+  }
+
+  // Nếu có lý do bị flag thì lưu và notify
   if (reasons.length > 0) {
-    await FlaggedContent.create({
-      comment: comment,
-      post: postId,
-      reason: reasons.join(', '),
-    });
-
     await notifyAdmins(
-      `Comment flagged on post ${postId}. Reason(s): ${reasons.join(', ')}`,
-      comment.user
+      `Post ${post._id} flagged. Reason(s): ${reasons.join(', ')}`,
+      post.user,
+      post
     );
-    return true;
   }
-
-  return false;
 };
+
+
+
+// export const moderateCommentContent = async (comment, postId) => {
+//   const reasons = [];
+
+//   const allBadWords = [
+//     ...sensitiveWords.vulgar,
+//     ...sensitiveWords.privacy,
+//     ...sensitiveWords.racist,
+//     ...sensitiveWords.sexist,
+//     ...sensitiveWords.suicide,
+//   ];
+
+//   const text = comment.text.toLowerCase();
+//   const detectedWords = allBadWords.filter(word => text.includes(word.toLowerCase()));
+//   if (detectedWords.length > 0) {
+//     reasons.push(`Comment contains inappropriate text: ${detectedWords.join(', ')}`);
+//   }
+
+//   if (reasons.length > 0) {
+//     await notifyAdmins(
+//       `Comment flagged on post ${postId}. Reason(s): ${reasons.join(', ')}`,
+//       comment.user,
+
+//     );
+//     return true;
+//   }
+
+//   return false;
+// };
