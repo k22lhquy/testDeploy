@@ -2,7 +2,7 @@ import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import Notification from "../models/notification.model.js";
-import DeletedPost from "../models/deletelog.model.js";
+// import DeletedPost from "../models/deletelog.model.js";
 
 const deleteAllNotification = async (req, res) => {
   try {
@@ -67,11 +67,11 @@ const deletePost = async (req, res) => {
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    await DeletedPost.create({
-      ...post.toObject(),
-      originalPostId: post._id,
-      deletedBy: adminId,
-    });
+    // await DeletedPost.create({
+    //   ...post.toObject(),
+    //   originalPostId: post._id,
+    //   deletedBy: adminId,
+    // });
 
     await Post.findByIdAndDelete(postId);
     res.status(200).json({ message: "Post deleted and backed up successfully" });
@@ -115,10 +115,10 @@ const deleteComment = async (req, res) => {
 
 const getDeletedPosts = async (req, res) => {
   try {
-    const posts = await DeletedPost.find()
-      .populate("user", "username")
-      .populate("deletedBy", "username")
-      .sort({ deletedAt: -1 });
+    // const posts = await DeletedPost.find()
+    //   .populate("user", "username")
+    //   .populate("deletedBy", "username")
+    //   .sort({ deletedAt: -1 });
 
     res.status(200).json({ message: "Deleted posts fetched", posts });
   } catch (error) {
