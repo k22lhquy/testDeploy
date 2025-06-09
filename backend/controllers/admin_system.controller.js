@@ -2,8 +2,6 @@ import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import Notification from "../models/notification.model.js";
-// import DeletedPost from "../models/deletelog.model.js";
-import FlaggedContent from "../moderation/FlaggedContent.js";
 
 const getUserActivities = async (req, res) => {
   const { userId } = req.params;
@@ -234,36 +232,9 @@ const getAnalytics = async (req, res) => {
   }
 };
 
-const getAllFlaggedPosts = async (req, res) => {
-  try {
-    const flagged = await FlaggedContent.find()
-      .sort({ detectedAt: -1 })
-      .populate({
-        path: "post",
-        populate: {
-          path: "user",
-          select: "username profileImg",
-        },
-        select: "text image createdAt",
-      })
-      .populate({
-        path: "reviewedBy",
-        select: "username profileImg",
-      });
-
-    const filtered = flagged.filter((item) => item.post !== null);
-
-    res.status(200).json(filtered);
-  } catch (err) {
-    console.error("Failed to fetch flagged posts:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
 export {
   getUserActivities,
   getAdminReports,
   getUserEvents,
   getAnalytics,
-  getAllFlaggedPosts,
 };

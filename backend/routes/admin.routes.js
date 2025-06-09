@@ -29,7 +29,6 @@ import {
   getAnalytics,
   getUserEvents,
   getAdminReports,
-  getAllFlaggedPosts,
 } from "../controllers/admin_system.controller.js";
 
 const router = express.Router();
@@ -45,7 +44,6 @@ router.put("/update/:userId", protectRoute, checkAdmin, updateUserProfile);
 router.get("/activities/:userId", protectRoute, checkAdmin, getUserActivities);
 router.get("/analytics", protectRoute, checkAdmin, getAnalytics);
 router.get("/events/:userId", protectRoute, checkAdmin, getUserEvents);
-router.get("/flaggedPosts", protectRoute, checkAdmin, getAllFlaggedPosts);
 
 router.delete("/posts/:postId", protectRoute, checkAdmin, deletePost);
 router.delete("/comments/:commentId", protectRoute, checkAdmin, deleteComment);
