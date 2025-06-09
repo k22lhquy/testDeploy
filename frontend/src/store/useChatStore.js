@@ -4,8 +4,8 @@ import toast from "react-hot-toast";
 import axiosInstance from "../apis/axiosInstance";
 import { io } from "socket.io-client";
 
-const BARE_URL = "http://localhost:5000";
-// const BARE_URL = "https://xx-m8te.onrender.com";
+// const BARE_URL = "http://localhost:5000";
+const BARE_URL = "https://xx-m8te.onrender.com";
 
 export const useChatStore = create(
   persist(

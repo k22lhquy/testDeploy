@@ -88,8 +88,8 @@ const LoginPage = () => {
           <button
             className="btn bg-white text-black border-[#e5e5e5]"
             onClick={() => {
-              // window.location.href = "https://xx-m8te.onrender.com/auth/google"; 
-              window.location.href = "http://localhost:5000/auth/google";   
+              window.location.href = "https://xx-m8te.onrender.com/auth/google"; 
+              // window.location.href = "http://localhost:5000/auth/google";   
             }}
           >
             <svg
