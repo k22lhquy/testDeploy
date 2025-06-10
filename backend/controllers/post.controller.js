@@ -142,6 +142,7 @@ const commentOnPost = async (req, res) => {
       //   ? "Comment added, but flagged for moderation"
       //   : "Comment added successfully",
       post,
+      comment
     });
   } catch (error) {
     console.error(error);

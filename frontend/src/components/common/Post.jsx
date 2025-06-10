@@ -57,7 +57,7 @@ const Post = ({ post, onRefresh }) => {
         { text: comment }
       );
       if (response.status === 200) {
-        setUpdatedComments((prev) => [...prev, comment]);
+        setUpdatedComments((prev) => [...prev, response.data.comment]);
         setComment("");
         toast.success("Comment posted successfully");
         // onRefresh(); // optional: or manually append new comment
