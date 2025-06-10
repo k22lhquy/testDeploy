@@ -334,7 +334,11 @@ const editPost = async (req, res) => {
       return res.status(400).json({ message: "Please provide text to update" });
     }
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId)
+  .populate({
+    path: "comments.user", // populate user trong comments
+    select: "username fullName profileImg",
+  });
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });

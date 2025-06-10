@@ -5,13 +5,12 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../../apis/axiosInstance";
 import toast from "react-hot-toast";
 import { formatPostDate } from "../../utils/date";
 import { useChatStore } from "../../store/useChatStore";
-import { set } from "mongoose";
 
 const Post = ({ post, onRefresh }) => {
   const {
@@ -20,10 +19,12 @@ const Post = ({ post, onRefresh }) => {
     reportComments,
     editCommentStore,
   } = useChatStore();
+
   const [comment, setComment] = useState("");
   const [reportText, setReportText] = useState("");
   const [reportComment, setReportComment] = useState("");
-  const [commentToReport, setCommentToReport] = useState("");
+  const [commentToReport, setCommentToReport] = useState(null);
+  const [commentToEdit, setCommentToEdit] = useState(null); // New state for edit
   const [editComment, setEditComment] = useState("");
   const [updatedComments, setUpdatedComments] = useState(post.comments);
 
@@ -38,7 +39,6 @@ const Post = ({ post, onRefresh }) => {
   const formattedDate = formatPostDate(post.createdAt);
   const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState(post.likes.length);
-  console.log("Post owner:", postOwner.username);
 
   const handleDeletePost = async () => {
     const response = await axiosInstance.delete(`/api/posts/${post._id}`);
@@ -60,7 +60,6 @@ const Post = ({ post, onRefresh }) => {
         setUpdatedComments((prev) => [...prev, response.data.comment]);
         setComment("");
         toast.success("Comment posted successfully");
-        // onRefresh(); // optional: or manually append new comment
       }
     } catch (error) {
       console.error("Error posting comment:", error);
@@ -71,8 +70,8 @@ const Post = ({ post, onRefresh }) => {
     try {
       const response = await axiosInstance.post(`/api/posts/like/${post._id}`);
       if (response.status === 200) {
-        setLiked(!liked); // toggle trạng thái like
-        setLikeCount((prev) => (liked ? prev - 1 : prev + 1)); // cập nhật số like
+        setLiked(!liked);
+        setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
       }
     } catch (error) {
       console.error("Error liking post:", error);
@@ -95,14 +94,14 @@ const Post = ({ post, onRefresh }) => {
   };
 
   const handleEditComment = async () => {
-    if (commentToReport) {
-      await editCommentStore(editComment, commentToReport);
+    if (commentToEdit) {
+      await editCommentStore(editComment, commentToEdit);
       setUpdatedComments((prev) =>
         prev.map((c) =>
-          c._id === commentToReport ? { ...c, text: editComment } : c
+          c._id === commentToEdit ? { ...c, text: editComment } : c
         )
       );
-      setCommentToReport(null);
+      setCommentToEdit(null);
       setEditComment("");
       editCommentModalRef.current?.close();
     }
@@ -116,7 +115,10 @@ const Post = ({ post, onRefresh }) => {
             to={`/profile/${postOwner.username}`}
             className="w-8 rounded-full overflow-hidden"
           >
-            <img src={postOwner.profileImg || "/avatar-placeholder.png"} />
+            <img
+              src={postOwner.profileImg || "/avatar-placeholder.png"}
+              alt="avatar"
+            />
           </Link>
         </div>
         <div className="flex flex-col flex-1">
@@ -284,31 +286,6 @@ const Post = ({ post, onRefresh }) => {
             ) : (
               updatedComments.map((c) => (
                 <div key={c._id} className="relative flex gap-2 items-start">
-                  {c.user._id !== user?._id && (
-                    <button
-                      className="absolute top-0 right-0 text-yellow-500 hover:text-yellow-400 font-bold text-lg"
-                      title="Report this comment"
-                      onClick={() => {
-                        setCommentToReport(c._id);
-                        reportCommentModalRef.current?.showModal();
-                      }}
-                    >
-                      !
-                    </button>
-                  )}
-                  {c.user._id === user?._id && (
-                    <button
-                      className="absolute top-0 right-0 text-yellow-500 hover:text-yellow-400 font-bold text-lg"
-                      title="Edit this comment"
-                      onClick={() => {
-                        setCommentToReport(c._id);
-                        setEditComment(c.text);
-                        editCommentModalRef.current?.showModal();
-                      }}
-                    >
-                      ...
-                    </button>
-                  )}
                   <div className="avatar">
                     <div className="w-8 rounded-full">
                       <img
@@ -326,6 +303,31 @@ const Post = ({ post, onRefresh }) => {
                     </div>
                     <div className="text-sm">{c.text}</div>
                   </div>
+
+                  {c.user._id === user?._id ? (
+                    <button
+                      className="absolute top-0 right-0 text-yellow-500 hover:text-yellow-400 font-bold text-lg"
+                      title="Edit this comment"
+                      onClick={() => {
+                        setCommentToEdit(c._id);
+                        setEditComment(c.text);
+                        editCommentModalRef.current?.showModal();
+                      }}
+                    >
+                      ...
+                    </button>
+                  ) : (
+                    <button
+                      className="absolute top-0 right-0 text-yellow-500 hover:text-yellow-400 font-bold text-lg"
+                      title="Report this comment"
+                      onClick={() => {
+                        setCommentToReport(c._id);
+                        reportCommentModalRef.current?.showModal();
+                      }}
+                    >
+                      !
+                    </button>
+                  )}
                 </div>
               ))
             )}
