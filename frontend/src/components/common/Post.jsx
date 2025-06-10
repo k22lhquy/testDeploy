@@ -1,4 +1,9 @@
-import { FaRegComment, FaRegHeart, FaRegBookmark, FaTrash } from "react-icons/fa";
+import {
+  FaRegComment,
+  FaRegHeart,
+  FaRegBookmark,
+  FaTrash,
+} from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -9,13 +14,21 @@ import { useChatStore } from "../../store/useChatStore";
 import { set } from "mongoose";
 
 const Post = ({ post, onRefresh }) => {
-  const { authUser: user, reportPost, reportComments, editCommentStore } = useChatStore();
+  const {
+    authUser: user,
+    reportPost,
+    reportComments,
+    editCommentStore,
+  } = useChatStore();
   const [comment, setComment] = useState("");
   const [reportText, setReportText] = useState("");
   const [reportComment, setReportComment] = useState("");
   const [commentToReport, setCommentToReport] = useState("");
   const [editComment, setEditComment] = useState("");
   const [updatedComments, setUpdatedComments] = useState(post.comments);
+
+  const [liked, setLiked] = useState(isLiked);
+  const [likeCount, setLikeCount] = useState(post.likes.length);
 
   const reportPostModalRef = useRef(null);
   const reportCommentModalRef = useRef(null);
@@ -40,7 +53,10 @@ const Post = ({ post, onRefresh }) => {
   const handlePostComment = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post(`/api/posts/comment/${post._id}`, { text: comment });
+      const response = await axiosInstance.post(
+        `/api/posts/comment/${post._id}`,
+        { text: comment }
+      );
       if (response.status === 200) {
         setUpdatedComments((prev) => [...prev, comment]);
         setComment("");
@@ -56,7 +72,8 @@ const Post = ({ post, onRefresh }) => {
     try {
       const response = await axiosInstance.post(`/api/posts/like/${post._id}`);
       if (response.status === 200) {
-        onRefresh();
+        setLiked(!liked); // toggle trạng thái like
+        setLikeCount((prev) => (liked ? prev - 1 : prev + 1)); // cập nhật số like
       }
     } catch (error) {
       console.error("Error liking post:", error);
@@ -96,7 +113,10 @@ const Post = ({ post, onRefresh }) => {
     <>
       <div className="flex gap-2 items-start p-4 border-b border-gray-700">
         <div className="avatar">
-          <Link to={`/profile/${postOwner.username}`} className="w-8 rounded-full overflow-hidden">
+          <Link
+            to={`/profile/${postOwner.username}`}
+            className="w-8 rounded-full overflow-hidden"
+          >
             <img src={postOwner.profileImg || "/avatar-placeholder.png"} />
           </Link>
         </div>
@@ -106,13 +126,18 @@ const Post = ({ post, onRefresh }) => {
               {postOwner.fullName}
             </Link>
             <span className="text-gray-700 flex gap-1 text-sm">
-              <Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
+              <Link to={`/profile/${postOwner.username}`}>
+                @{postOwner.username}
+              </Link>
               <span>·</span>
               <span>{formattedDate}</span>
             </span>
             <span className="flex justify-end flex-1">
               {isMyPost ? (
-                <FaTrash className="cursor-pointer hover:text-red-500" onClick={handleDeletePost} />
+                <FaTrash
+                  className="cursor-pointer hover:text-red-500"
+                  onClick={handleDeletePost}
+                />
               ) : (
                 <button
                   className="text-yellow-500 hover:text-yellow-400 font-bold text-lg"
@@ -128,7 +153,10 @@ const Post = ({ post, onRefresh }) => {
           <div className="flex flex-col gap-3 overflow-hidden">
             <span>{post.text}</span>
             {post.image && (
-              <img src={post.image} className="h-80 object-contain rounded-lg border border-gray-700" />
+              <img
+                src={post.image}
+                className="h-80 object-contain rounded-lg border border-gray-700"
+              />
             )}
           </div>
 
@@ -146,13 +174,26 @@ const Post = ({ post, onRefresh }) => {
 
               <div className="flex gap-1 items-center group cursor-pointer">
                 <BiRepost className="w-6 h-6 text-slate-500 group-hover:text-green-500" />
-                <span className="text-sm text-slate-500 group-hover:text-green-500">0</span>
+                <span className="text-sm text-slate-500 group-hover:text-green-500">
+                  0
+                </span>
               </div>
 
-              <div className="flex gap-1 items-center group cursor-pointer" onClick={handleLikePost}>
-                <FaRegHeart className={`w-4 h-4 ${isLiked ? "text-pink-500" : "text-slate-500"} group-hover:text-pink-500`} />
-                <span className={`text-sm ${isLiked ? "text-pink-500" : "text-slate-500"} group-hover:text-pink-500`}>
-                  {post.likes.length}
+              <div
+                className="flex gap-1 items-center group cursor-pointer"
+                onClick={handleLikePost}
+              >
+                <FaRegHeart
+                  className={`w-4 h-4 ${
+                    liked ? "text-pink-500" : "text-slate-500"
+                  } group-hover:text-pink-500`}
+                />
+                <span
+                  className={`text-sm ${
+                    liked ? "text-pink-500" : "text-slate-500"
+                  } group-hover:text-pink-500`}
+                >
+                  {likeCount}
                 </span>
               </div>
             </div>
@@ -174,8 +215,15 @@ const Post = ({ post, onRefresh }) => {
             onChange={(e) => setReportText(e.target.value)}
           />
           <div className="modal-action mt-4">
-            <form method="dialog"><button className="btn">Cancel</button></form>
-            <button onClick={handleSubmitReport} className="btn btn-error text-white">Submit Report</button>
+            <form method="dialog">
+              <button className="btn">Cancel</button>
+            </form>
+            <button
+              onClick={handleSubmitReport}
+              className="btn btn-error text-white"
+            >
+              Submit Report
+            </button>
           </div>
         </div>
       </dialog>
@@ -190,8 +238,15 @@ const Post = ({ post, onRefresh }) => {
             onChange={(e) => setReportComment(e.target.value)}
           />
           <div className="modal-action mt-4">
-            <form method="dialog"><button className="btn">Cancel</button></form>
-            <button onClick={handleSubmitReportComment} className="btn btn-error text-white">Submit Report</button>
+            <form method="dialog">
+              <button className="btn">Cancel</button>
+            </form>
+            <button
+              onClick={handleSubmitReportComment}
+              className="btn btn-error text-white"
+            >
+              Submit Report
+            </button>
           </div>
         </div>
       </dialog>
@@ -206,8 +261,15 @@ const Post = ({ post, onRefresh }) => {
             onChange={(e) => setEditComment(e.target.value)}
           />
           <div className="modal-action mt-4">
-            <form method="dialog"><button className="btn">Cancel</button></form>
-            <button onClick={handleEditComment} className="btn btn-error text-white">Submit Edit</button>
+            <form method="dialog">
+              <button className="btn">Cancel</button>
+            </form>
+            <button
+              onClick={handleEditComment}
+              className="btn btn-error text-white"
+            >
+              Submit Edit
+            </button>
           </div>
         </div>
       </dialog>
@@ -217,7 +279,9 @@ const Post = ({ post, onRefresh }) => {
           <h3 className="font-bold text-lg mb-4">COMMENTS</h3>
           <div className="flex flex-col gap-3 max-h-60 overflow-auto">
             {updatedComments.length === 0 ? (
-              <p className="text-sm text-slate-500">No comments yet 🤔 Be the first one 😉</p>
+              <p className="text-sm text-slate-500">
+                No comments yet 🤔 Be the first one 😉
+              </p>
             ) : (
               updatedComments.map((c) => (
                 <div key={c._id} className="relative flex gap-2 items-start">
@@ -248,13 +312,18 @@ const Post = ({ post, onRefresh }) => {
                   )}
                   <div className="avatar">
                     <div className="w-8 rounded-full">
-                      <img src={c.user.profileImg || "/avatar-placeholder.png"} alt="avatar" />
+                      <img
+                        src={c.user.profileImg || "/avatar-placeholder.png"}
+                        alt="avatar"
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col w-full pr-5">
                     <div className="flex items-center gap-1">
                       <span className="font-bold">{c.user.fullName}</span>
-                      <span className="text-gray-700 text-sm">@{c.user.username}</span>
+                      <span className="text-gray-700 text-sm">
+                        @{c.user.username}
+                      </span>
                     </div>
                     <div className="text-sm">{c.text}</div>
                   </div>
@@ -263,14 +332,19 @@ const Post = ({ post, onRefresh }) => {
             )}
           </div>
 
-          <form className="flex gap-2 items-center mt-4 border-t border-gray-600 pt-2" onSubmit={handlePostComment}>
+          <form
+            className="flex gap-2 items-center mt-4 border-t border-gray-600 pt-2"
+            onSubmit={handlePostComment}
+          >
             <textarea
               className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none border-gray-800"
               placeholder="Add a comment..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
-            <button className="btn btn-primary rounded-full btn-sm text-white px-4">Comment</button>
+            <button className="btn btn-primary rounded-full btn-sm text-white px-4">
+              Comment
+            </button>
           </form>
         </div>
         <form method="dialog" className="modal-backdrop">
