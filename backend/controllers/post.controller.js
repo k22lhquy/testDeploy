@@ -126,7 +126,7 @@ const commentOnPost = async (req, res) => {
     }
 
     const comment = {
-      user: userId,
+      user,
       text,
     };
 
