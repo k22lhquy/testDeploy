@@ -27,9 +27,6 @@ const Post = ({ post, onRefresh }) => {
   const [editComment, setEditComment] = useState("");
   const [updatedComments, setUpdatedComments] = useState(post.comments);
 
-  const [liked, setLiked] = useState(isLiked);
-  const [likeCount, setLikeCount] = useState(post.likes.length);
-
   const reportPostModalRef = useRef(null);
   const reportCommentModalRef = useRef(null);
   const commentsModalRef = useRef(null);
@@ -39,6 +36,8 @@ const Post = ({ post, onRefresh }) => {
   const isLiked = post.likes.includes(user?._id);
   const isMyPost = user?._id === post.user._id;
   const formattedDate = formatPostDate(post.createdAt);
+  const [liked, setLiked] = useState(isLiked);
+  const [likeCount, setLikeCount] = useState(post.likes.length);
   console.log("Post owner:", postOwner.username);
 
   const handleDeletePost = async () => {
