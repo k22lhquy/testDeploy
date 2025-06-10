@@ -33,7 +33,7 @@ const notificationReport = async (req, res) => {
       .populate({
         path: "post",
         populate: { path: "user", model: "User" },
-    });
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({ message: "Notifications retrieved successfully", notifications });
   } catch (error) {
