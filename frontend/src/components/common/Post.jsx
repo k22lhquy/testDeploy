@@ -6,6 +6,7 @@ import axiosInstance from "../../apis/axiosInstance";
 import toast from "react-hot-toast";
 import { formatPostDate } from "../../utils/date";
 import { useChatStore } from "../../store/useChatStore";
+import { set } from "mongoose";
 
 const Post = ({ post, onRefresh }) => {
   const { authUser: user, reportPost, reportComments, editCommentStore } = useChatStore();
@@ -41,6 +42,7 @@ const Post = ({ post, onRefresh }) => {
     try {
       const response = await axiosInstance.post(`/api/posts/comment/${post._id}`, { text: comment });
       if (response.status === 200) {
+        setUpdatedComments((prev) => [...prev, comment]);
         setComment("");
         toast.success("Comment posted successfully");
         // onRefresh(); // optional: or manually append new comment
