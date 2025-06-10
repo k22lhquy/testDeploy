@@ -10,7 +10,6 @@ import { moderatePostContent } from "../moderation/moderation.service.js";
 //   notifyAdmins
 // } from '../moderation/moderation.service.js';
 
-
 const getPostById = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -29,7 +28,6 @@ const getPostById = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 const createPost = async (req, res) => {
   try {
@@ -142,7 +140,7 @@ const commentOnPost = async (req, res) => {
       //   ? "Comment added, but flagged for moderation"
       //   : "Comment added successfully",
       post,
-      comment
+      comment,
     });
   } catch (error) {
     console.error(error);
@@ -311,7 +309,7 @@ const editComment = async (req, res) => {
   try {
     const { commentId } = req.params;
     const { text } = req.body;
-    const userId = req.user._id;
+    const { userId } = req.user;
 
     if (!text) {
       return res.status(400).json({ message: "Please provide text to update" });
@@ -334,11 +332,10 @@ const editPost = async (req, res) => {
       return res.status(400).json({ message: "Please provide text to update" });
     }
 
-    const post = await Post.findById(postId)
-  .populate({
-    path: "comments.user", // populate user trong comments
-    select: "username fullName profileImg",
-  });
+    const post = await Post.findById(postId).populate({
+      path: "comments.user", // populate user trong comments
+      select: "username fullName profileImg",
+    });
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
@@ -405,7 +402,6 @@ const reportComment = async (req, res) => {
   }
 };
 
-
 export {
   getPostById,
   createPost,
@@ -419,5 +415,5 @@ export {
   reportPost,
   editComment,
   reportComment,
-  editPost
+  editPost,
 };
