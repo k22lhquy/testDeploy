@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoSettingsOutline } from "react-icons/io5";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import axiosInstance from "../../../apis/axiosInstance";
@@ -17,7 +17,8 @@ const NotificationsAdmin = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const postDialog = React.useRef(null);
+  const postDialog = useRef(null);
+  const [selectedPost, setSelectedPost] = useState(null); // thêm state
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -49,7 +50,7 @@ const NotificationsAdmin = () => {
       <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen">
         <div className="flex justify-between items-center p-4 border-b border-gray-700">
           <p className="font-bold">Notifications</p>
-          <div className="dropdown ">
+          <div className="dropdown">
             <div tabIndex={0} role="button" className="m-1">
               <IoSettingsOutline className="w-4" />
             </div>
@@ -74,7 +75,6 @@ const NotificationsAdmin = () => {
         {notifications?.map((notification) => (
           <div className="border-b border-gray-700" key={notification._id}>
             <div className="flex gap-2 p-4">
-              {/* <Link to={`/admin/profile/${notification.from.username}`}></Link> */}
               <div>
                 <div className="avatar">
                   <div className="w-8 rounded-full">
@@ -87,32 +87,42 @@ const NotificationsAdmin = () => {
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <Link to={`/admin/profile/${notification.from.username}`} className="font-bold">
+                  <Link
+                    to={`/admin/profile/${notification.from.username}`}
+                    className="font-bold"
+                  >
                     @{notification.from.username}
                   </Link>{" "}
                   report post with reason {notification.reason}
-                  <span onClick={() => postDialog.current.showModal()}
-                  className="flex gap-2 cursor-pointer underline">(post)</span>
+                  <span
+                    onClick={() => {
+                      setSelectedPost(notification.post);
+                      postDialog.current.showModal();
+                    }}
+                    className="flex gap-2 cursor-pointer underline"
+                  >
+                    (post)
+                  </span>
                 </div>
               </div>
-              {console.log(notification.post)}
-              <dialog
-                id="post"
-                className="modal"
-                ref={postDialog}
-                onClick={(e) => {
-                  if (e.target === postDialog.current) {
-                    postDialog.current.close();
-                  }
-                }}
-              >
-                <div className="w-full max-w-5xl modal-box">
-                  <PostAdmin post={notification.post} postKey={"abc"} />
-                </div>
-              </dialog>
             </div>
           </div>
         ))}
+
+        <dialog
+          id="post"
+          className="modal"
+          ref={postDialog}
+          onClick={(e) => {
+            if (e.target === postDialog.current) {
+              postDialog.current.close();
+            }
+          }}
+        >
+          <div className="w-full max-w-5xl modal-box">
+            {selectedPost && <PostAdmin post={selectedPost} postKey={"abc"} />}
+          </div>
+        </dialog>
       </div>
     </>
   );
