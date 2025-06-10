@@ -315,10 +315,29 @@ const editComment = async (req, res) => {
       return res.status(400).json({ message: "Please provide text to update" });
     }
 
-    // Code for editing comment here (đoạn code bạn chưa cung cấp đủ, bạn có thể tự bổ sung)
+    const post = await Post.findOne({ "comments._id": commentId });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const comment = post.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    comment.text = text;
+
+    await post.save();
+
+    res.status(200).json({ message: "Comment updated successfully", post });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error in editComment controller:", error);
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 
