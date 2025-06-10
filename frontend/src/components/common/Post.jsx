@@ -43,7 +43,7 @@ const Post = ({ post, onRefresh }) => {
       if (response.status === 200) {
         setComment("");
         toast.success("Comment posted successfully");
-        onRefresh(); // optional: or manually append new comment
+        // onRefresh(); // optional: or manually append new comment
       }
     } catch (error) {
       console.error("Error posting comment:", error);
