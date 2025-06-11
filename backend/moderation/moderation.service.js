@@ -29,7 +29,6 @@ export const moderatePostContent = async (post) => {
     ...sensitiveWords.suicide,
   ];
 
-  // Kiểm tra text
   if (post.text) {
     const text = post.text.toLowerCase();
     const detectedWords = allBadWords.filter(word => text.includes(word.toLowerCase()));
@@ -38,14 +37,11 @@ export const moderatePostContent = async (post) => {
     }
   }
 
-  // Kiểm tra ảnh qua API detectImage
   if (post.image) {
     try {
-      // Gọi API detectImage trả về kết quả
       const result = await detectImage(post.image);
 
       if (result.is_approved === false) {
-        // Nếu không approved, ghi lý do ra
         reasons.push(`Image flagged for ${result.reason} (confidence: ${(result.confidence * 100).toFixed(1)}%)`);
         console.log(`Image flagged for ${result.reason} (confidence: ${(result.confidence * 100).toFixed(1)}%)`)
       }
