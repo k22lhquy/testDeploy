@@ -41,9 +41,9 @@ export const moderatePostContent = async (post) => {
     try {
       const result = await detectImage(post.image);
 
-      if (result.is_approved === false) {
-        reasons.push(`Image flagged for ${result.reason} (confidence: ${(result.confidence * 100).toFixed(1)}%)`);
-        console.log(`Image flagged for ${result.reason} (confidence: ${(result.confidence * 100).toFixed(1)}%)`)
+      if (result.data.is_approved === false) {
+        reasons.push(`Image flagged for ${result.data.reason} (confidence: ${(result.data.confidence * 100).toFixed(1)}%)`);
+        console.log(`Image flagged for ${result.data.reason} (confidence: ${(result.data.confidence * 100).toFixed(1)}%)`)
       }
     } catch (err) {
       console.error('Error detecting image:', err);
