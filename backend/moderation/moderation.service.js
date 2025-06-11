@@ -40,7 +40,7 @@ export const moderatePostContent = async (post) => {
   if (post.image) {
     try {
       const result = await detectImage(post.image);
-      console.log(result.data)
+      console.log(result)
       if (result.data.is_approved === false) {
         reasons.push(`Image flagged for ${result.data.reason} (confidence: ${(result.data.confidence * 100).toFixed(1)}%)`);
         console.log(`Image flagged for ${result.data.reason} (confidence: ${(result.data.confidence * 100).toFixed(1)}%)`)
